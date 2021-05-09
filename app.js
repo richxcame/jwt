@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
+const { authMiddleware, checkUser } = require('./middleware/authMiddleware');
 
 const app = express();
 
@@ -17,6 +18,7 @@ mongoose.connect("mongodb://localhost:27017/jwt", { useNewUrlParser: true, useUn
 	})
   .catch(err => console.log(err));
 
-app.get('/', (req, res) => res.render('home'))
-app.get('/smoothies', (req, res) => res.render('smoothies'))
+app.use('*', checkUser);
+app.get('/', authMiddleware, (req, res) => res.render('home'));
+app.get('/smoothies', authMiddleware, (req, res) => res.render('smoothies'));
 app.use(authRoutes);
